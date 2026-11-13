@@ -1,6 +1,6 @@
 # 아키텍처
 
-[C4 모델](https://c4model.com)의 세 단계(시스템 컨텍스트 → 컨테이너 → 컴포넌트)로 문서화합니다. 코드 수준(4단계)은 소스 코드가 그 역할을 하므로 별도 다이어그램을 두지 않습니다. 다이어그램 원본(`.drawio`)은 [`diagrams/`](diagrams/)에 있습니다.
+[C4 모델](https://c4model.com)의 세 단계(시스템 컨텍스트 → 컨테이너 → 컴포넌트)와 동적 다이어그램으로 문서화합니다. 코드 수준(4단계)은 소스 코드가 그 역할을 하므로 별도 다이어그램을 두지 않습니다. 다이어그램 원본(`.drawio`)은 [`diagrams/`](diagrams/)에 있습니다.
 
 ## 1. 시스템 컨텍스트
 
@@ -40,6 +40,21 @@ humor-aggregator는 유머 출처 사이트에서 콘텐츠를 수집하고, 중
 | (공통) | `HumorAggregator.Core` | 공통 모델(`HumorItem` 등)과 인터페이스(`ICollector`, `IDedupService`, `IRuleEngine`, `IPublisher`) |
 
 단위 테스트는 `HumorAggregator.Tests`(xUnit)에 있습니다.
+
+## 4. 동적: 파이프라인 1회 실행
+
+![파이프라인 1회 실행](diagrams/c4-dynamic.png)
+
+스케줄에 따라 파이프라인이 한 번 실행될 때의 정상 경로입니다. 숫자는 호출 순서입니다.
+
+1. 파이프라인 실행기가 Collectors에 수집을 요청합니다.
+2. Collectors가 출처 사이트에서 콘텐츠를 가져옵니다.
+3. 실행기가 Dedup에 중복 판정을 요청합니다.
+4. Dedup이 데이터 저장소에서 기존 해시를 조회하고, 신규 콘텐츠의 해시를 기록합니다.
+5. 실행기가 RuleEngine에 신규 콘텐츠의 규칙 평가를 요청합니다.
+6. RuleEngine이 규칙·설정 파일에서 사이트별 게시 규칙을 읽어 평가합니다.
+7. 실행기가 규칙을 통과한 콘텐츠의 게시를 Publishers에 요청합니다.
+8. Publishers가 게시 대상 사이트의 공식 API로 콘텐츠를 게시합니다.
 
 ## 설계 결정
 
