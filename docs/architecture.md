@@ -35,7 +35,7 @@ humor-aggregator는 유머 출처 사이트에서 콘텐츠를 수집하고, 중
 | 파이프라인 실행기 | `HumorAggregator.Host` | 단계 호출, 스케줄링, 로깅 |
 | Collectors | `HumorAggregator.Collectors` | 출처별 수집기. 출처마다 구현체를 추가 |
 | Dedup | `HumorAggregator.Dedup` | 텍스트·이미지 유사도 기반 중복 판정 |
-| RuleEngine | `HumorAggregator.RuleEngine` | 사이트별 게시 규칙을 CEL로 평가 |
+| RuleEngine | `HumorAggregator.RuleEngine` | 사이트별 게시 규칙과 일일 게시 한도를 CEL로 평가 |
 | Publishers | `HumorAggregator.Publishers` | 사이트별 게시 모듈. 게시 대상마다 구현체를 추가 |
 | (공통) | `HumorAggregator.Core` | 공통 모델(`HumorItem` 등)과 인터페이스(`ICollector`, `IDedupService`, `IRuleEngine`, `IPublisher`) |
 
@@ -51,8 +51,8 @@ humor-aggregator는 유머 출처 사이트에서 콘텐츠를 수집하고, 중
 2. Collectors가 출처 사이트에서 콘텐츠를 가져옵니다.
 3. 실행기가 Dedup에 중복 판정을 요청합니다.
 4. Dedup이 데이터 저장소에서 기존 해시를 조회하고, 신규 콘텐츠의 해시를 기록합니다.
-5. 실행기가 RuleEngine에 신규 콘텐츠의 규칙 평가를 요청합니다.
-6. RuleEngine이 규칙·설정 파일에서 사이트별 게시 규칙을 읽어 평가합니다.
+5. 실행기가 RuleEngine에 신규 콘텐츠의 규칙 평가를 요청합니다. 이때 오늘의 게시 건수를 평가 입력으로 함께 전달합니다.
+6. RuleEngine이 규칙·설정 파일에서 사이트별 게시 규칙과 한도를 읽어, 게시할 콘텐츠를 선별합니다.
 7. 실행기가 규칙을 통과한 콘텐츠의 게시를 Publishers에 요청합니다.
 8. Publishers가 게시 대상 사이트의 공식 API로 콘텐츠를 게시합니다.
 
@@ -60,6 +60,8 @@ humor-aggregator는 유머 출처 사이트에서 콘텐츠를 수집하고, 중
 
 - **규칙 표현: [CEL](https://github.com/google/cel-spec)** — 사이트마다 다른 게시 규칙을 코드 변경 없이 정의할 수 있고, 평가 범위가 제한되어 임의 코드 실행 위험이 없습니다.
 - **게시 방식: 각 사이트의 공식 API 우선** — 브라우저 자동화를 쓰지 않으므로 실행 환경이 가볍습니다. 첫 번째 대상은 네이버 카페 Open API(OAuth 2.0)입니다.
+- **게시 한도 관리** — 게시 대상 사이트가 계정 단위로 걸어 두는 일일 한도(네이버 카페는 계정당 하루 200건, 모든 카페 합산)와 사이트별 상한, 최소 게시 간격을 규칙으로 정의합니다. 게시 후보가 한도보다 많으면 우선순위로 선별하고, 실제 게시량을 기록해 한도 조정의 근거로 삼습니다.
+- **중복 판정 단위: 게시 대상별** — 같은 콘텐츠를 서로 다른 게시 대상에 올릴 수 있지만, 같은 게시 대상에는 한 번만 올립니다.
 - **확장 지점: 플러그인 구조** — 새 출처와 새 게시 대상은 `Collectors`, `Publishers`에 구현체를 추가하는 방식으로 확장합니다.
 
 ## 배포
