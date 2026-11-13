@@ -1,0 +1,64 @@
+<mxfile host="Electron">
+  <diagram name="아키텍처 (세션 1)" id="session1-arch">
+    <mxGraphModel dx="1710" dy="773" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0" adaptiveColors="auto">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;fontSize=20;fontStyle=1;html=1;align=left;verticalAlign=middle;" value="유머 수집·게시 파이프라인 아키텍처 (세션 1)" vertex="1">
+          <mxGeometry height="30" width="620" x="40" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="host" parent="1" style="swimlane;startSize=30;fillColor=#F7F8FA;strokeColor=#D5DAE1;html=1;fontSize=14;fontStyle=1;" value="HumorAggregator.Host (Worker Service) — 오케스트레이션" vertex="1">
+          <mxGeometry height="560" width="280" x="40" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="collectors" parent="host" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fillColor=#EEF4FF;strokeColor=#9DB8F2;" value="Collectors&lt;br&gt;&lt;small&gt;소스별 수집기&lt;/small&gt;" vertex="1">
+          <mxGeometry height="80" width="200" x="40" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="dedup" parent="host" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fillColor=#EEF4FF;strokeColor=#9DB8F2;" value="Dedup&lt;br&gt;&lt;small&gt;텍스트/이미지 중복 제거&lt;/small&gt;" vertex="1">
+          <mxGeometry height="80" width="200" x="40" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="ruleengine" parent="host" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fillColor=#FFF6E0;strokeColor=#E8C36A;" value="RuleEngine&lt;br&gt;&lt;small&gt;CEL 표현식으로 사이트별 규칙 평가&lt;/small&gt;" vertex="1">
+          <mxGeometry height="80" width="200" x="40" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="publishers" parent="host" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fillColor=#EEF4FF;strokeColor=#9DB8F2;" value="Publishers&lt;br&gt;&lt;small&gt;사이트별 게시 모듈 (플러그인형)&lt;br&gt;&lt;/small&gt;" vertex="1">
+          <mxGeometry height="80" width="200" x="40" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="host" source="collectors" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#8A94A6;fontColor=#5A626E;defaultLabelBackgroundColor=page;labelPlacement=auto;" target="dedup" value="HumorItem">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="host" source="dedup" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#8A94A6;fontColor=#5A626E;defaultLabelBackgroundColor=page;labelPlacement=auto;" target="ruleengine" value="중복제거됨">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="host" source="ruleengine" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#8A94A6;fontColor=#5A626E;defaultLabelBackgroundColor=page;labelPlacement=auto;" target="publishers" value="게시 대상">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="core" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fillColor=#F3EEFF;strokeColor=#B9A6F0;" value="HumorAggregator.Core&lt;br&gt;&lt;small&gt;공통 모델(HumorItem 등)&lt;br&gt;ICollector / IDedupService /&lt;br&gt;IRuleEngine / IPublisher&lt;/small&gt;" vertex="1">
+          <mxGeometry height="120" width="220" x="400" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="navercafe" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fillColor=#F2F4F7;strokeColor=#B8C0CC;" value="게시 대상 사이트" vertex="1">
+          <mxGeometry height="70" width="200" x="80" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="tests" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fillColor=#FFF9DB;strokeColor=#E9D58A;dashed=1;" value="HumorAggregator.Tests&lt;br&gt;&lt;small&gt;xUnit (Core/Dedup/RuleEngine)&lt;/small&gt;" vertex="1">
+          <mxGeometry height="70" width="220" x="400" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="publishers" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#8A94A6;fontColor=#5A626E;defaultLabelBackgroundColor=page;labelPlacement=auto;" target="navercafe" value="게시 호출">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r1" edge="1" parent="1" source="collectors" style="edgeStyle=orthogonalEdgeStyle;dashed=1;html=1;strokeColor=#B9A6F0;fontColor=#5A626E;defaultLabelBackgroundColor=page;labelPlacement=auto;" target="core" value="참조">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r2" edge="1" parent="1" source="dedup" style="edgeStyle=orthogonalEdgeStyle;dashed=1;html=1;strokeColor=#B9A6F0;fontColor=#5A626E;defaultLabelBackgroundColor=page;labelPlacement=auto;" target="core" value="참조">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r3" edge="1" parent="1" source="ruleengine" style="edgeStyle=orthogonalEdgeStyle;dashed=1;html=1;strokeColor=#B9A6F0;fontColor=#5A626E;defaultLabelBackgroundColor=page;labelPlacement=auto;" target="core" value="참조">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r4" edge="1" parent="1" source="publishers" style="edgeStyle=orthogonalEdgeStyle;dashed=1;html=1;strokeColor=#B9A6F0;fontColor=#5A626E;defaultLabelBackgroundColor=page;labelPlacement=auto;" target="core" value="참조">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r5" edge="1" parent="1" source="tests" style="edgeStyle=orthogonalEdgeStyle;dashed=1;html=1;strokeColor=#E9D58A;fontColor=#5A626E;defaultLabelBackgroundColor=page;labelPlacement=auto;" target="core" value="테스트 대상">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

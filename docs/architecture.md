@@ -4,7 +4,7 @@
 
 draw.io 소스 다이어그램: [`docs/architecture.drawio`](./architecture.drawio) (draw.io 데스크톱 앱 또는 https://app.diagrams.net 의 "파일 열기"로 확인)
 
-구성 요소: `Collectors → Dedup → RuleEngine(CEL) → Publishers(사이트별 게시 모듈, 현재 대상 네이버 카페 Open API)` 파이프라인이 `Host(Worker Service)` 안에서 순차 실행되며, 모든 레이어가 `Core`(공통 모델·인터페이스)를 참조하고 `Tests`가 Core/Dedup/RuleEngine을 검증한다. Publishers는 특정 사이트에 고정되지 않은 플러그인형 구조로, 향후 네이버 카페 외 사이트 추가 시 이 레이어에 구현체를 추가한다.
+구성 요소: `Collectors → Dedup → RuleEngine(CEL) → Publishers(사이트별 게시 모듈)` 파이프라인이 `Host(Worker Service)` 안에서 순차 실행되며, 모든 레이어가 `Core`(공통 모델·인터페이스)를 참조하고 `Tests`가 Core/Dedup/RuleEngine을 검증한다. Publishers는 특정 사이트에 고정되지 않은 플러그인형 구조로, 새 게시 대상 사이트는 이 레이어에 구현체를 추가하여 확장한다.
 
 ## 프로젝트 구조
 
