@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/HumorAggregator.Collectors/HumorAggregator.Collectors.csproj" />
+    <Project Path="src/HumorAggregator.Core/HumorAggregator.Core.csproj" />
+    <Project Path="src/HumorAggregator.Dedup/HumorAggregator.Dedup.csproj" />
+    <Project Path="src/HumorAggregator.Host/HumorAggregator.Host.csproj" />
+    <Project Path="src/HumorAggregator.Publishers/HumorAggregator.Publishers.csproj" />
+    <Project Path="src/HumorAggregator.RuleEngine/HumorAggregator.RuleEngine.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/HumorAggregator.Tests/HumorAggregator.Tests.csproj" />
+  </Folder>
+</Solution>
