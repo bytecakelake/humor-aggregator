@@ -2,51 +2,9 @@
 
 ## 전체 파이프라인
 
-```
-          ┌───────────────────────┐
-          │   Collectors (소스별)   │   확정된 유머 출처마다 1개 구현체
-          │  HumorAggregator.      │   (세션 2에서 소스 확정, 세션 4에서 구현)
-          │  Collectors            │
-          └───────────┬────────────┘
-                      │  HumorItem (원본)
-                      ▼
-          ┌───────────────────────┐
-          │   Dedup (중복 제거)      │   텍스트/이미지 유사도 + 해싱
-          │  HumorAggregator.      │   (세션 5)
-          │  Dedup                 │
-          └───────────┬────────────┘
-                      │  HumorItem (중복 제거됨)
-                      ▼
-          ┌───────────────────────┐
-          │  Rule Engine (CEL)     │   카페별 게시 규칙(선정 기준,
-          │  HumorAggregator.      │   가공 방식, 게시 주기 등)을
-          │  RuleEngine            │   CEL 표현식으로 평가
-          └───────────┬────────────┘   (세션 6)
-                      │  게시 대상 + 가공된 콘텐츠
-                      ▼
-          ┌───────────────────────┐
-          │  Publishers (사이트별)   │   현재: 네이버 카페 Open API
-          │  HumorAggregator.      │   (POST .../cafe/{clubid}/menu/
-          │  Publishers            │    {menuid}/articles, OAuth2)
-          └───────────┬────────────┘   (세션 7)
-                      │
-                      ▼
-               네이버 카페 게시 완료
+draw.io 소스 다이어그램: [`docs/architecture.drawio`](./architecture.drawio) (draw.io 데스크톱 앱 또는 https://app.diagrams.net 의 "파일 열기"로 확인)
 
-  ┌─────────────────────────────────────────────┐
-  │  HumorAggregator.Core                        │
-  │  공통 모델(HumorItem 등), 인터페이스 정의        │
-  │  (ICollector, IDedupService, IRuleEngine,     │
-  │   IPublisher) — 모든 레이어가 참조               │
-  └─────────────────────────────────────────────┘
-
-  ┌─────────────────────────────────────────────┐
-  │  HumorAggregator.Host (Worker Service)       │
-  │  오케스트레이션, 스케줄러, 로깅/알림 (세션 8)     │
-  │  Core/Collectors/Dedup/RuleEngine/Publishers  │
-  │  전체 참조                                     │
-  └─────────────────────────────────────────────┘
-```
+구성 요소: `Collectors → Dedup → RuleEngine(CEL) → Publishers(사이트별 게시 모듈, 현재 대상 네이버 카페 Open API)` 파이프라인이 `Host(Worker Service)` 안에서 순차 실행되며, 모든 레이어가 `Core`(공통 모델·인터페이스)를 참조하고 `Tests`가 Core/Dedup/RuleEngine을 검증한다. Publishers는 특정 사이트에 고정되지 않은 플러그인형 구조로, 향후 네이버 카페 외 사이트 추가 시 이 레이어에 구현체를 추가한다.
 
 ## 프로젝트 구조
 
